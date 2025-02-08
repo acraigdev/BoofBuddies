@@ -47,8 +47,36 @@ module.exports = {
         },
       },
       {
-        test: /\.(s(a|c)ss)$/,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
+        test: /\.s?[ac]ss$/i,
+        use: [
+          {
+            loader: 'style-loader',
+          },
+          {
+            // https://www.npmjs.com/package/css-loader
+            loader: 'css-loader',
+            options: {
+              esModule: false,
+              importLoaders: 2, // 2 other loaders used first, postcss-loader
+              sourceMap: isDevelopment,
+            },
+          },
+          {
+            // process tailwind stuff
+            // https://webpack.js.org/loaders/postcss-loader/
+            loader: 'postcss-loader',
+            options: {
+              sourceMap: isDevelopment,
+              postcssOptions: {
+                plugins: [
+                  require('@tailwindcss/postcss'),
+                  // add addtional postcss plugins here
+                  // easily find plugins at https://www.postcss.parts/
+                ],
+              },
+            },
+          },
+        ],
       },
       {
         test: /\.html$/i,
@@ -65,7 +93,7 @@ module.exports = {
     }),
     new HtmlWebPackPlugin({
       template: './src/index.html',
-      filename: './index.html',
+      favicon: './favicon.ico',
     }),
     isDevelopment && new ReactRefreshWebpackPlugin(),
   ],

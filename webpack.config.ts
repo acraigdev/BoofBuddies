@@ -1,7 +1,8 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebPackPlugin = require('html-webpack-plugin');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+import path from 'path';
+import webpack from 'webpack';
+import HtmlWebPackPlugin from 'html-webpack-plugin';
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -20,7 +21,9 @@ module.exports = {
     hot: true,
     historyApiFallback: true,
   },
-  output: { path: path.resolve(__dirname, 'build') },
+  output: {
+    path: path.resolve(__dirname, 'build'),
+  },
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js', '.scss', '.css'],
   },
@@ -49,9 +52,15 @@ module.exports = {
       {
         test: /\.s?[ac]ss$/i,
         use: [
-          {
-            loader: 'style-loader',
-          },
+          isDevelopment
+            ? 'style-loader'
+            : {
+                // save the css to external file
+                loader: MiniCssExtractPlugin.loader,
+                options: {
+                  esModule: false,
+                },
+              },
           {
             // https://www.npmjs.com/package/css-loader
             loader: 'css-loader',
@@ -85,6 +94,14 @@ module.exports = {
           esModule: false,
         },
       },
+      {
+        test: /\.(ico)$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          esModule: false,
+        },
+      },
     ],
   },
   plugins: [
@@ -94,8 +111,14 @@ module.exports = {
     new HtmlWebPackPlugin({
       template: './src/index.html',
       favicon: './favicon.ico',
+      filename: './index.html',
     }),
     isDevelopment && new ReactRefreshWebpackPlugin(),
+    // https://webpack.js.org/plugins/mini-css-extract-plugin/
+    // dump css into its own files
+    new MiniCssExtractPlugin({
+      filename: 'assets/css/[name].min.css',
+    }),
   ],
   performance: {
     hints: false,

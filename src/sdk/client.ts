@@ -1,4 +1,4 @@
-export const client = `https://frontend-take-home-service.fetch.com`;
+export const client = 'https://frontend-take-home-service.fetch.com';
 
 interface Input {
   body?: Record<string, any>;
@@ -28,7 +28,7 @@ class Client {
         credentials: 'include',
         headers,
       },
-    );
+    ).then(processRes);
   }
 
   async post({ api, input }: { api: string; input?: Input }) {
@@ -40,8 +40,25 @@ class Client {
         credentials: 'include',
         headers,
       },
-    );
+    ).then(processRes);
   }
 }
 
 export const fetchApiClient = new Client();
+
+function processRes(res: Response) {
+  if (res.status === 401) {
+    window.location.replace('?expired=true');
+  }
+  if (res.status !== 200) {
+    return res.text().then((text: string) => {
+      throw new Error(text);
+    });
+  }
+  const contentType = res.headers.get('content-type');
+  if (contentType && contentType.indexOf('application/json') !== -1) {
+    return res.json();
+  } else {
+    return res.text();
+  }
+}

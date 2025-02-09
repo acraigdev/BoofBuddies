@@ -13,25 +13,32 @@ export const searchDogs = async ({
   from,
   sort,
 }: {
-  breeds: Array<string>;
-  zipCodes: Array<string>;
-  ageMin: number;
-  ageMax: number;
-  size: string;
-  from: string; //?
-  sort: string;
+  breeds?: Array<string>;
+  zipCodes?: Array<string>;
+  ageMin?: number;
+  ageMax?: number;
+  size?: string;
+  from?: string;
+  sort?: string;
 }) => {
-  return await fetchApiClient.get({
+  const getIds = await fetchApiClient.get({
     api: '/dogs/search',
     input: {
       body: { breeds, zipCodes, ageMin, ageMax },
-      query: { size, from, sort },
+      query: {
+        ...(size && { size }),
+        ...(from && { from }),
+        ...(sort && { sort }),
+      },
     },
   });
+
+  // Rather than handling via linked queries, keep the search and dogs by id together
+  // So we only have to worry about pagination handling with a single
+  return await listDogs({ ids: getIds.resultIds });
 };
 
-// TODO: Not sure the purpose of this one
-export const dogs = async ({ ids }: { ids: Array<string> }) => {
+export const listDogs = async ({ ids }: { ids: Array<string> }) => {
   return await fetchApiClient.post({ api: '/dogs', input: { body: ids } });
 };
 

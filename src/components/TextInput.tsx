@@ -1,5 +1,6 @@
-import React, { Ref, useImperativeHandle, useRef, useState } from 'react';
-import { Maybe, Nullable, ValidationDelegate } from '../utils/typeHelpers';
+import type { Ref } from 'react';
+import React, { useImperativeHandle, useRef, useState } from 'react';
+import type { Maybe, Nullable, ValidationDelegate } from '../utils/typeHelpers';
 import { v4 as uuidv4 } from 'uuid';
 import { Icons } from '../components/Icons';
 import { SpaceBetween } from './SpaceBetween';
@@ -36,7 +37,8 @@ export function TextInput({
       const isValid = validation?.(val);
       if (!isValid) {
         setIsError(true);
-        shouldFocus && inputRef.current?.focus();
+        // @ts-expect-error TODO: add generic typing for ref
+        if (shouldFocus) inputRef.current?.focus();
         return false;
       }
       setIsError(false);
@@ -56,7 +58,7 @@ export function TextInput({
             setIsError(false);
             onValChange(e.target.value);
           }}
-          className="bg-purple-light border border-gray-light text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+          className="border border-gray-light text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
           type="text"
           ref={inputRef}
           placeholder={placeholder}

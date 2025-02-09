@@ -1,5 +1,4 @@
-import React from 'react';
-import { lazy, Suspense } from 'react';
+import React, { lazy, Suspense } from 'react';
 
 const Login = lazy(() =>
   import('./Login').then(module => ({

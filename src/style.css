@@ -44,6 +44,34 @@ p {
   @apply text-base font-medium;
 }
 
+a {
+  &.button {
+    @apply bg-gray-dark text-white py-2 px-4 rounded-lg text-lg cursor-pointer text-center;
+  }
+}
+
 button {
-  @apply bg-gray-dark text-white py-2 px-4 rounded-lg text-lg cursor-pointer;
+  &.primary {
+    @apply bg-gray-dark text-white py-2 px-4 rounded-lg text-lg cursor-pointer;
+  }
+
+  &[disabled] {
+    @apply bg-gray-light cursor-not-allowed;
+  }
+
+  &.inverted {
+    @apply bg-inherit border-2 border-white;
+  }
+
+  &.link {
+    @apply underline bg-inherit text-gray-dark cursor-pointer;
+
+    &.inverted {
+      @apply border-none text-white;
+    }
+  }
+
+  &.icon {
+    @apply p-2 rounded-full;
+  }
 }

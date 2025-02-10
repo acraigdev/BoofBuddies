@@ -15,6 +15,8 @@ interface TextInputProps {
   classes?: string;
   validationDelegate?: Nullable<Ref<ValidationDelegate>>;
   type?: 'input' | 'textarea';
+  description?: string;
+  onEnter?: () => void;
 }
 
 export function TextInput({
@@ -27,6 +29,8 @@ export function TextInput({
   classes,
   validationDelegate,
   type = 'input',
+  description,
+  onEnter,
 }: TextInputProps) {
   const id = `form-${uuidv4()}`;
   const inputRef = useRef(null);
@@ -49,20 +53,36 @@ export function TextInput({
     <div className={classes}>
       <label htmlFor={id} className="block mb-2">
         <p>{label}</p>
+        {description && (
+          <span className="text-sm text-gray-500">{description}</span>
+        )}
       </label>
       {type === 'input' && (
-        <input
-          id={id}
-          value={val}
-          onChange={e => {
-            setIsError(false);
-            onValChange(e.target.value);
-          }}
-          className="border border-gray-light text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-          type="text"
-          ref={inputRef}
-          placeholder={placeholder}
-        />
+        <div className="flex justify-between border border-gray-light text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5">
+          <input
+            id={id}
+            value={val}
+            onChange={e => {
+              setIsError(false);
+              onValChange(e.target.value);
+            }}
+            type="text"
+            ref={inputRef}
+            placeholder={placeholder}
+            onKeyDown={e => {
+              if (e.key === 'Enter') onEnter?.();
+            }}
+          />
+          {!!onEnter && (
+            <button
+              className="cursor-pointer bg-blue border-none rounded-full px-2 text-xl text-white font-bold"
+              onClick={() => onEnter?.()}
+              aria-label="Add item"
+            >
+              +
+            </button>
+          )}
+        </div>
       )}
       {type === 'textarea' && (
         <textarea

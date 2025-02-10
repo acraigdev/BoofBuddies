@@ -1,3 +1,4 @@
+import type { Nullable } from '../utils/typeHelpers';
 import { fetchApiClient } from './client';
 
 export const breeds = async () => {
@@ -7,16 +8,14 @@ export const breeds = async () => {
 export const searchDogs = async ({
   breeds,
   zipCodes,
-  ageMin,
-  ageMax,
+  age,
   size,
   from,
   sort,
 }: {
-  breeds?: Array<string>;
-  zipCodes?: Array<string>;
-  ageMin?: number;
-  ageMax?: number;
+  breeds?: Set<string>;
+  zipCodes?: Set<string>;
+  age?: Nullable<{ min: Nullable<number>; max: Nullable<number> }>;
   size?: string;
   from?: string;
   sort?: string;
@@ -24,7 +23,14 @@ export const searchDogs = async ({
   const getIds = await fetchApiClient.get({
     api: '/dogs/search',
     input: {
-      body: { breeds, zipCodes, ageMin, ageMax },
+      body: {
+        ...(breeds?.size && { breeds }),
+        ...(zipCodes?.size && { zipCodes }),
+        ...((age?.max || age?.min) && {
+          ...(age.min && { ageMin: age.min }),
+          ...(age.max && { ageMax: age.max }),
+        }),
+      },
       query: {
         ...(size && { size }),
         ...(from && { from }),

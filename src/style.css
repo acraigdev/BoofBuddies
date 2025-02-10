@@ -12,6 +12,18 @@ body {
   @apply font-body bg-gray-light m-0;
 }
 
+.scrollbar::-webkit-scrollbar {
+  @apply w-2;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  @apply bg-gray-light rounded-lg;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-gray-dark rounded-lg;
+}
+
 h1,
 h2,
 h3,

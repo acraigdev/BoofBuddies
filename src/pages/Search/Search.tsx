@@ -3,30 +3,32 @@ import { LayoutFrame } from '../../components/LayoutFrame';
 import { ContentBox } from '../../components/ContentBox';
 import * as dogs from '../../sdk/dogs';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Icons } from '../../components/Icons';
 import { Dropdown } from '../../components/Dropdown';
 import { SpaceBetween } from '../../components/SpaceBetween';
 import { Alert } from '../../components/Alert';
 import { DogCard } from './components/DogCard';
-import type { Dog } from '../../sdk/types';
+import type { Dog, Filters } from '../../sdk/types';
 import { useFavoriteDogContext } from '../../utils/FavoriteDogContext';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { queryClient } from '../../utils/queryClient';
+import { SearchFilters } from './components/SearchFilters';
 
 // TODO:
 // filters and sort
 // queryFactory
 // pagination
 // stretch: image hover popover
+
 export function Search() {
   const navigate = useNavigate();
   const { favoriteDogs } = useFavoriteDogContext();
-  const [pageSize, setPageSize] = useState('25');
   const [sortBy, setSortBy] = useState('breed:asc');
-  // const { data: breeds } = useQuery({
-  //   queryKey: ['getBreeds'],
-  //   queryFn: dogs.breeds,
-  // });
+  const [filters, setFilters] = useState<Filters>(() => ({
+    pageSize: '25',
+    age: null,
+    zipCodes: new Set<string>(),
+    breeds: new Set<string>(),
+  }));
 
   // TODO: infinite
   const {
@@ -35,8 +37,17 @@ export function Search() {
     isLoading: searchedDogsLoading,
   } = useQuery({
     queryKey: ['searchDogs', sortBy],
-    queryFn: () => dogs.searchDogs({ size: pageSize, sort: sortBy }),
+    queryFn: () =>
+      dogs.searchDogs({
+        size: filters.pageSize,
+        sort: sortBy,
+        breeds: filters.breeds,
+        zipCodes: filters.zipCodes,
+        age: filters.age,
+      }),
   });
+
+  console.log(filters);
 
   const { mutateAsync: findMatch } = useMutation({
     mutationFn: async () => await dogs.match({ ids: Array.from(favoriteDogs) }),
@@ -70,9 +81,10 @@ export function Search() {
             direction="horizontal"
             alignOverride="items-end"
           >
-            <button className="primary icon">
-              <Icons.Filter className="size-6" />
-            </button>
+            <SearchFilters
+              filters={filters}
+              onFilterChange={filters => setFilters(filters)}
+            />
             <Dropdown
               label="Sort by"
               items={[

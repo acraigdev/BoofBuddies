@@ -1,18 +1,17 @@
 import React from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { LayoutFrame } from '../../components/LayoutFrame';
 import { ContentBox } from '../../components/ContentBox';
 import { useQuery } from '@tanstack/react-query';
 import * as dogs from '../../sdk/dogs';
-import invariant from 'ts-invariant';
+import { invariant } from 'ts-invariant';
 import { Alert } from '../../components/Alert';
 import { SpaceBetween } from '../../components/SpaceBetween';
 import type { Dog } from '../../sdk/types';
 
+// TODO mobile
 export function Match() {
   const { matchId } = useParams();
-  const navigate = useNavigate();
-
   invariant(matchId, 'matchId nullish or undefined');
 
   const {
@@ -41,6 +40,7 @@ export function Match() {
             </Alert>
           )}
           {match && (
+            // TODO: change to grid for mobile
             <SpaceBetween size="l" direction="horizontal">
               <img src={match.img} className="w-1/2" />
               <SpaceBetween size="m">

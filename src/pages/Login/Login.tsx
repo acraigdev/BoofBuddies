@@ -12,6 +12,7 @@ import { Icons } from '../../components/Icons';
 export function Login() {
   const navigate = useNavigate();
   const [searchParams, _setSearchParams] = useSearchParams();
+  // TODO clean
   const [name, setName] = useState('Moxxi');
   const [email, setEmail] = useState('moxxi@gmail.com');
 

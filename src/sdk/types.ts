@@ -1,3 +1,5 @@
+import type { Nullable } from '../utils/typeHelpers';
+
 export interface Dog {
   id: string;
   img: string;
@@ -6,6 +8,13 @@ export interface Dog {
   zip_code: string;
   breed: string;
 }
+
+export type Filters = {
+  pageSize: string;
+  zipCodes: Set<string>;
+  age: Nullable<{ min?: Nullable<number>; max?: Nullable<number> }>;
+  breeds: Set<string>;
+};
 
 export interface Location {
   zip_code: string;

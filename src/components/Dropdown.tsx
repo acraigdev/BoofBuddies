@@ -31,9 +31,7 @@ export function Dropdown({
         onChange={e => onSelectionChange(e.target.value)}
         className={`${!selected ? 'text-gray-500' : ''} border border-gray-light text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
       >
-        <option selected={selected === undefined} value={undefined}>
-          None
-        </option>
+        <option value={undefined}>None</option>
         {items.map(item => (
           <option key={item.value} value={item.value}>
             {item.label ? item.label : item.value}

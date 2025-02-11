@@ -79,7 +79,7 @@ export function Login() {
               validationDelegate={emailDelegate}
               validation={val =>
                 Boolean(
-                  val !== '' && val?.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
+                  val !== '' && val?.match(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/),
                 )
               }
               validationError={'Enter a valid email.'}

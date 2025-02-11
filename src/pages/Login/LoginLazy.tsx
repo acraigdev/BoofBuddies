@@ -1,4 +1,5 @@
 import React, { lazy, Suspense } from 'react';
+import { Spinner } from '../../components/Spinner';
 
 const Login = lazy(() =>
   import('./Login').then(module => ({
@@ -8,7 +9,7 @@ const Login = lazy(() =>
 
 export function LoginLazy() {
   return (
-    <Suspense>
+    <Suspense fallback={<Spinner />}>
       <Login />
     </Suspense>
   );

@@ -58,7 +58,7 @@ export function TextInput({
         )}
       </label>
       {type === 'input' && (
-        <div className="flex justify-between border border-gray-light text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5">
+        <div className="relative">
           <input
             id={id}
             value={val}
@@ -66,6 +66,7 @@ export function TextInput({
               setIsError(false);
               onValChange(e.target.value);
             }}
+            className="flex justify-between border border-gray-light text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5"
             type="text"
             ref={inputRef}
             placeholder={placeholder}
@@ -75,7 +76,7 @@ export function TextInput({
           />
           {!!onEnter && (
             <button
-              className="cursor-pointer bg-blue border-none rounded-full px-2 text-xl text-white font-bold"
+              className="cursor-pointer bg-blue border-none rounded-full px-2 text-xl text-white font-bold absolute right-2 top-2"
               onClick={() => onEnter?.()}
               aria-label="Add item"
             >
@@ -92,7 +93,7 @@ export function TextInput({
             setIsError(false);
             onValChange(e.target.value);
           }}
-          className="bg-purple-light border border-gray-light text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+          className="border border-gray-light text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
           ref={inputRef}
           placeholder={placeholder}
         />

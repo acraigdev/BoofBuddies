@@ -1,4 +1,5 @@
 import React, { lazy, Suspense } from 'react';
+import { Spinner } from '../../components/Spinner';
 
 const Match = lazy(() =>
   import('./Match').then(module => ({
@@ -8,7 +9,7 @@ const Match = lazy(() =>
 
 export function MatchLazy() {
   return (
-    <Suspense>
+    <Suspense fallback={<Spinner />}>
       <Match />
     </Suspense>
   );

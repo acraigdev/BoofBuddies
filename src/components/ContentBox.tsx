@@ -8,7 +8,9 @@ interface ContentBoxProps {
 
 export function ContentBox({ className, children }: ContentBoxProps) {
   return (
-    <div className={`bg-white p-4 md:p-15 rounded-lg shadow-sm ${className}`}>
+    <div
+      className={`bg-white p-4 md:p-15 rounded-lg shadow-sm ${className ?? ''}`}
+    >
       {children}
     </div>
   );

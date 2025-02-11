@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import type { Nullable } from '../utils/typeHelpers';
+import React, { useMemo, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Icons } from './Icons';
+import { autoUpdate, flip, useFloating } from '@floating-ui/react-dom';
+import { useOuterClickHandler } from '../utils/useOuterClickHandler';
+import { SpaceBetween } from './SpaceBetween';
+import { Tag } from './Tag';
 
 interface MultiSelectProps {
-  selected: Nullable<Set<string>>;
+  selected: Set<string>;
   onSelectionChange: (selected: Set<string>) => void;
-  options: Array<{
-    label?: string;
-    value: string | number;
-  }>;
+  options: Set<string>;
   label: string;
 }
 
@@ -20,51 +20,136 @@ export function MultiSelect({
   options,
 }: MultiSelectProps) {
   const id = `multiselect-${uuidv4()}`;
-  const [menuOpen, setMenuOpen] = useState(true);
-  const openMenu = () => {
-    setMenuOpen(true);
+  const clickRef = useRef<HTMLDivElement>(null);
+  const [search, setSearch] = useState('');
+  const [optionsOpen, setOptionsOpen] = useState(false);
+  const openOptions = () => {
+    setOptionsOpen(!optionsOpen);
   };
+  const { refs, floatingStyles } = useFloating({
+    open: optionsOpen,
+    placement: 'bottom-start',
+    whileElementsMounted: autoUpdate,
+    middleware: [flip()],
+  });
+  useOuterClickHandler({
+    ref: clickRef,
+    onOuterClick: () => {
+      setOptionsOpen(false);
+    },
+  });
+
+  // Use memo since computing on large data set
+  const filteredOptions = useMemo(() => {
+    // filter + includes because the data set won't grow
+    return [...options].filter(option =>
+      option.toLowerCase().includes(search.toLowerCase()),
+    );
+  }, [options, search]);
   return (
     <div className="relative">
       <label htmlFor={id} className="block mb-2">
         <p>{label}</p>
       </label>
       <div
+        className="relative"
         id={id}
-        className="cursor-pointer flex justify-between items-center border border-gray-light text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5"
-        onClick={() => openMenu()}
+        ref={refs.setReference}
+        onClick={() => openOptions()}
       >
-        <span className="text-gray-500">Select</span>
-        <Icons.Chevron className="size-3 rotate-180" />
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="cursor-pointer flex justify-between items-center border border-gray-light text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5"
+          onFocus={() => setOptionsOpen(true)}
+          aria-label="Type your breed to filter breed results. Press escape to close the menu"
+          onKeyDown={e => {
+            if (e.key === 'Escape') {
+              setOptionsOpen(false);
+              return;
+            }
+            setOptionsOpen(true);
+          }}
+        />
+        <Icons.Chevron className="size-3 rotate-180 absolute top-0 bottom-0 right-2 my-auto text-gray-500" />
       </div>
-      {menuOpen && (
-        <div className="absolute top-full left-2">
-          <div className="flex flex-col-reverse max-h-64 w-64 rounded-lg shadow-xl bg-white border border-gray-200 overflow-auto scrollbar">
-            {options.map(option => (
-              <MenuOption key={option.value} {...option} />
+      {optionsOpen && (
+        <div ref={refs.setFloating} style={floatingStyles} className="w-full">
+          <div
+            ref={clickRef}
+            className="flex flex-col max-h-64 rounded-lg shadow-xl bg-white border border-gray-200 overflow-auto scrollbar w-full"
+          >
+            {filteredOptions.map(option => (
+              <Option
+                key={option}
+                label={option}
+                checked={selected.has(option)}
+                onChecked={isChecked => {
+                  const selectedNew = new Set(selected);
+                  if (isChecked) {
+                    selectedNew.add(option);
+                  } else {
+                    selectedNew.delete(option);
+                  }
+                  onSelectionChange(selectedNew);
+                }}
+                onEscape={() => setOptionsOpen(false)}
+              />
             ))}
-            Using flexbox, a flex container with flex-end alignment and stretch,
-            each child(ul) would have fixed width and height set to be a
-            reversed flex column. The children(li) would then grow upwards from
-            the bottom.
           </div>
         </div>
+      )}
+      {!!selected.size && (
+        <SpaceBetween
+          size="xs"
+          direction="horizontal"
+          className="flex-wrap mt-2"
+        >
+          {Array.from(selected).map(value => (
+            <Tag
+              key={value}
+              tag={value}
+              onTagRemove={tag => {
+                const copy = new Set(selected);
+                copy.delete(tag);
+                onSelectionChange(copy);
+              }}
+            />
+          ))}
+        </SpaceBetween>
       )}
     </div>
   );
 }
 
-function MenuOption({
+function Option({
   label,
-  value,
+  checked,
+  onChecked,
+  onEscape,
 }: {
-  label?: string;
-  value: string | number;
+  label: string;
+  checked: boolean;
+  onChecked: (checked: boolean) => void;
+  onEscape: () => void;
 }) {
   return (
-    <div className="p-2">
-      <input type="checkbox" />
-      {label ?? value}
-    </div>
+    <button
+      tabIndex={0}
+      className="z-1 p-2 cursor-pointer text-left"
+      onClick={() => onChecked(!checked)}
+      onKeyDown={e => {
+        if (e.key === 'Escape') onEscape();
+      }}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        readOnly
+        tabIndex={-1}
+        className="cursor-pointer -z-1 mr-1 "
+      />
+      {label}
+    </button>
   );
 }

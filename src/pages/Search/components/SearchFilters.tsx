@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal } from '../../../components/Modal';
+import { Menu } from '../../../components/Menu';
 import { Icons } from '../../../components/Icons';
 import { SpaceBetween } from '../../../components/SpaceBetween';
 import { Slider } from '../../../components/Slider';
@@ -7,7 +7,7 @@ import type { Filters } from '../../../sdk/types';
 import { MultiInput } from '../../../components/MultiInput';
 import { Dropdown } from '../../../components/Dropdown';
 import { MultiSelect } from '../../../components/MultiSelect';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import * as Dogs from '../../../sdk/dogs';
 
 interface SearchFiltersProps {
@@ -16,11 +16,12 @@ interface SearchFiltersProps {
 }
 
 // TODO semantic form
+// zip validation message
 export function SearchFilters({
   filters: { pageSize, zipCodes, age, breeds },
   onFilterChange,
 }: SearchFiltersProps) {
-  const [showModal, setShowModal] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [formFilters, setFormFilters] = useState(() => ({
     pageSize,
     zipCodes,
@@ -28,19 +29,19 @@ export function SearchFilters({
     breeds,
   }));
 
-  const { data: breedOptions } = useQuery({
+  const { data: breedOptions } = useSuspenseQuery({
     queryKey: ['getBreeds'],
     queryFn: Dogs.breeds,
-    select: res => res.map((breed: string) => ({ value: breed })),
+    select: res => new Set<string>(res),
   });
 
   return (
     <>
-      <button className="primary icon" onClick={() => setShowModal(true)}>
+      <button className="primary icon" onClick={() => setShowMenu(true)}>
         <Icons.Filter className="size-6" />
       </button>
-      {showModal && (
-        <Modal title="Filter results" onDismiss={() => setShowModal(false)}>
+      {showMenu && (
+        <Menu title="Filter results" onDismiss={() => setShowMenu(false)}>
           <SpaceBetween size="sm">
             <Slider
               value={formFilters.pageSize}
@@ -92,6 +93,7 @@ export function SearchFilters({
                 }))}
               />
             </div>
+            {/* TODO - limit */}
             <MultiInput
               values={formFilters.zipCodes}
               onValuesChange={values =>
@@ -102,6 +104,7 @@ export function SearchFilters({
               validate={val => Boolean(!!val && /^\d{5}$/.test(val))}
               placeholder="12345"
             />
+            {/* TODO - limit */}
             <MultiSelect
               selected={formFilters.breeds}
               onSelectionChange={val =>
@@ -114,21 +117,21 @@ export function SearchFilters({
               label="Breeds"
             />
             <div className="w-full flex justify-end gap-4">
-              <button className="link" onClick={() => setShowModal(false)}>
+              <button className="link" onClick={() => setShowMenu(false)}>
                 <p>Cancel</p>
               </button>
               <button
                 className="primary"
                 onClick={() => {
                   onFilterChange(formFilters);
-                  setShowModal(false);
+                  setShowMenu(false);
                 }}
               >
                 <p>Update filters</p>
               </button>
             </div>
           </SpaceBetween>
-        </Modal>
+        </Menu>
       )}
     </>
   );

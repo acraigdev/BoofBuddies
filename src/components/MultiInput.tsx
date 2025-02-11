@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TextInput } from './TextInput';
 import { SpaceBetween } from './SpaceBetween';
 import { Icons } from './Icons';
+import { Tag } from './Tag';
 
 interface MultiInputProps {
   values: Set<string>;
@@ -54,22 +55,5 @@ export function MultiInput({
         </SpaceBetween>
       )}
     </SpaceBetween>
-  );
-}
-
-function Tag({
-  tag,
-  onTagRemove,
-}: {
-  tag: string;
-  onTagRemove: (tag: string) => void;
-}) {
-  return (
-    <span className="bg-blue text-white p-1 rounded-sm min-w-fit">
-      <span className="pr-1">{tag}</span>
-      <button className="align-middle" onClick={() => onTagRemove(tag)}>
-        <Icons.XMark className="size-4" />
-      </button>
-    </span>
   );
 }

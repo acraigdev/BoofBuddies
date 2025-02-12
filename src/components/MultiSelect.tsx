@@ -51,12 +51,7 @@ export function MultiSelect({
       <label htmlFor={id} className="block mb-2">
         <p>{label}</p>
       </label>
-      <div
-        className="relative"
-        id={id}
-        ref={refs.setReference}
-        onClick={() => openOptions()}
-      >
+      <div className="relative" id={id} ref={refs.setReference}>
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -68,7 +63,6 @@ export function MultiSelect({
               setOptionsOpen(false);
               return;
             }
-            setOptionsOpen(true);
           }}
         />
         <Icons.Chevron className="size-3 rotate-180 absolute top-0 bottom-0 right-2 my-auto text-gray-500" />

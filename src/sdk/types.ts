@@ -10,7 +10,7 @@ export interface Dog {
 }
 
 export type Filters = {
-  pageSize: string;
+  pageSize: number;
   zipCodes: Set<string>;
   age: Nullable<{ min?: Nullable<number>; max?: Nullable<number> }>;
   breeds: Set<string>;

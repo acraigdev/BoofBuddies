@@ -1,9 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import React from 'react';
-import * as auth from '../sdk/auth';
 import { matchPath, useLocation, useNavigate } from 'react-router-dom';
 import { ErrorBoundary } from './ErrorBoundary';
+import { fetchApiClient } from '../sdk/client';
+import { SpaceBetween } from './SpaceBetween';
+import { Icons } from './Icons';
 
 interface LayoutFrameProps {
   children: ReactNode;
@@ -15,7 +17,7 @@ export function LayoutFrame({ children }: LayoutFrameProps) {
 
   const isLogin = matchPath('/', pathname);
   const { mutate: logout } = useMutation({
-    mutationFn: () => auth.logout(),
+    mutationFn: async () => await fetchApiClient.post({ api: '/auth/logout' }),
     onSuccess: () => {
       navigate('/');
     },
@@ -28,7 +30,10 @@ export function LayoutFrame({ children }: LayoutFrameProps) {
           <h1 className="text-5xl font-fancy">BoofBuddies</h1>
           {!isLogin && (
             <button className="link inverted" onClick={() => logout()}>
-              Log out
+              <SpaceBetween direction="horizontal" size="xs">
+                Log out
+                <Icons.Logout className="size-5" />
+              </SpaceBetween>
             </button>
           )}
         </div>

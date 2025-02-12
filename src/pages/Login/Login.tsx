@@ -3,11 +3,11 @@ import { LayoutFrame } from '../../components/LayoutFrame';
 import { ContentBox } from '../../components/ContentBox';
 import { SpaceBetween } from '../../components/SpaceBetween';
 import { TextInput } from '../../components/TextInput';
-import { login } from '../../sdk/auth';
 import { useMutation } from '@tanstack/react-query';
 import type { ValidationDelegate } from '../../utils/typeHelpers';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Icons } from '../../components/Icons';
+import { fetchApiClient } from '../../sdk/client';
 
 export function Login() {
   const navigate = useNavigate();
@@ -20,7 +20,16 @@ export function Login() {
   const emailDelegate = useRef<ValidationDelegate>(null);
 
   const { mutateAsync: authenticate } = useMutation({
-    mutationFn: () => login(name, email),
+    mutationFn: async () =>
+      await fetchApiClient.post({
+        api: '/auth/login',
+        input: {
+          body: {
+            name,
+            email,
+          },
+        },
+      }),
     onSuccess: () => {
       navigate('/search');
     },

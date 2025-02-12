@@ -8,7 +8,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 
 module.exports = {
   mode: isDevelopment ? 'development' : 'production',
-  devtool: isDevelopment ? 'source-map' : false,
+  // devtool: isDevelopment ? 'source-map' : false,
   watchOptions: {
     poll: 1000,
     aggregateTimeout: 1000,
@@ -114,8 +114,6 @@ module.exports = {
       filename: './index.html',
     }),
     isDevelopment && new ReactRefreshWebpackPlugin(),
-    // https://webpack.js.org/plugins/mini-css-extract-plugin/
-    // dump css into its own files
     new MiniCssExtractPlugin({
       filename: 'assets/css/[name].min.css',
     }),

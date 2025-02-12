@@ -2,7 +2,7 @@
 
 ## Development
 
-This application uses Webpack, Tailwind, React and TypeScript
+This application uses Webpack, Tailwind, React and TypeScript. Node@22/npm@10
 
 ### To run locally
 

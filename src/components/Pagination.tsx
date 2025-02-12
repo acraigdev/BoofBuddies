@@ -1,11 +1,12 @@
 import React from 'react';
+import { SpaceBetween } from './SpaceBetween';
 
 interface PaginationProps {
   openEnded?: boolean;
-  itemsPerPage?: number;
+  itemsPerPage: number;
   itemCount: number;
   currentPage: number;
-  onCurrentPageChange: () => void;
+  onCurrentPageChange: (page: number) => void;
 }
 
 /**
@@ -17,11 +18,34 @@ interface PaginationProps {
  * pages clickable
  */
 
-export function Pagination({openEnded}: PaginationProps) {
+export function Pagination({
+  openEnded,
+  itemsPerPage,
+  itemCount,
+  currentPage,
+  onCurrentPageChange,
+}: PaginationProps) {
+  const numberOfPages = itemCount / itemsPerPage;
   return (
-    <div>
-      <button>Previous</button>
-      <button>Next →</button>
-    </div>
+    <SpaceBetween direction="horizontal" size="sm">
+      <button className="link" disabled={currentPage === 0}>
+        ← Previous
+      </button>
+      {new Array(numberOfPages).fill('').map((_x, i) => (
+        <button
+          key={i}
+          className={currentPage === i ? 'primary small' : 'link'}
+        >
+          {i + 1}
+        </button>
+      ))}
+      {openEnded && <span>...</span>}
+      <button
+        className="link"
+        disabled={currentPage === numberOfPages - 1 && !openEnded}
+      >
+        Next →
+      </button>
+    </SpaceBetween>
   );
 }

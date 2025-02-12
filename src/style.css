@@ -65,6 +65,9 @@ a {
 button {
   &.primary {
     @apply bg-gray-dark text-white py-2 px-4 rounded-lg text-lg cursor-pointer;
+    &.small {
+      @apply px-3 py-0;
+    }
   }
 
   &[disabled] {
@@ -76,7 +79,14 @@ button {
   }
 
   &.link {
-    @apply underline bg-inherit text-gray-dark cursor-pointer;
+    @apply bg-inherit text-gray-dark cursor-pointer;
+
+    &[enabled] {
+      @apply hover:font-bold focus:font-bold;
+    }
+    &[disabled] {
+      @apply text-gray-light cursor-not-allowed;
+    }
 
     &.inverted {
       @apply border-none text-white;

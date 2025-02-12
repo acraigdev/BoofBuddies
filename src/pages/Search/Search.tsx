@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LayoutFrame } from '../../components/LayoutFrame';
 import { ContentBox } from '../../components/ContentBox';
-import * as dogs from '../../sdk/dogs';
+import * as DogQueries from '../../sdk/DogQueries';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Dropdown } from '../../components/Dropdown';
 import { SpaceBetween } from '../../components/SpaceBetween';
@@ -12,45 +12,49 @@ import { useFavoriteDogContext } from '../../utils/FavoriteDogContext';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { queryClient } from '../../utils/queryClient';
 import { SearchFilters } from './components/SearchFilters';
+import { fetchApiClient } from '../../sdk/client';
+import { Pagination } from '../../components/Pagination';
+import type { Maybe } from '../../utils/typeHelpers';
 
 // TODO:
-// filters and sort
 // queryFactory
 // pagination
 // stretch: image hover popover
+// large screen wider + 4
 
 export function Search() {
   const navigate = useNavigate();
   const { favoriteDogs } = useFavoriteDogContext();
   const [sortBy, setSortBy] = useState('breed:asc');
   const [filters, setFilters] = useState<Filters>(() => ({
-    pageSize: '25',
+    pageSize: 25,
     age: null,
     zipCodes: new Set<string>(),
     breeds: new Set<string>(),
   }));
+  const [currentPage, setCurrentPage] = useState(0);
 
   // TODO: infinite
   const {
     data: searchedDogs,
     error: searchedDogsError,
     isLoading: searchedDogsLoading,
-  } = useQuery({
-    queryKey: ['searchDogs', sortBy],
-    queryFn: () =>
-      dogs.searchDogs({
-        size: filters.pageSize,
-        sort: sortBy,
-        breeds: filters.breeds,
-        zipCodes: filters.zipCodes,
-        age: filters.age,
-      }),
+  } = useQuery<Maybe<Array<Dog>>>({
+    ...DogQueries.searchDogs({
+      size: String(filters.pageSize),
+      sort: sortBy,
+      breeds: filters.breeds,
+      zipCodes: filters.zipCodes,
+      age: filters.age,
+    }),
   });
 
-  console.log(filters);
-
   const { mutateAsync: findMatch } = useMutation({
-    mutationFn: async () => await dogs.match({ ids: Array.from(favoriteDogs) }),
+    mutationFn: async () =>
+      await fetchApiClient.post({
+        api: '/dogs/match',
+        input: { body: Array.from(favoriteDogs) },
+      }),
     onSuccess: res => {
       navigate(generatePath('/match/:matchId', { matchId: res.match }));
     },
@@ -58,14 +62,14 @@ export function Search() {
 
   return (
     <LayoutFrame>
-      <ContentBox className="w-full">
+      <ContentBox className="w-full lg:w-3/4">
         <SpaceBetween size="m">
           <div className="sm:flex justify-between items-center">
             <div className="basis-3/4 mb-2">
               <h2>Find your match</h2>
               <p>
-                Favorite dogs that spark your interest and click "Match me" to
-                be matched with the perfect friend for you
+                Favorite dogs that spark your interest and click &quot;Match
+                me&quot; to be matched with the perfect friend for you
               </p>
             </div>
             <button
@@ -76,29 +80,38 @@ export function Search() {
               Match me
             </button>
           </div>
-          <SpaceBetween
-            size="m"
-            direction="horizontal"
-            alignOverride="items-end"
-          >
-            <SearchFilters
-              filters={filters}
-              onFilterChange={filters => setFilters(filters)}
+          <div className="flex justify-between items-center">
+            <SpaceBetween
+              size="m"
+              direction="horizontal"
+              alignOverride="items-end"
+            >
+              <SearchFilters
+                filters={filters}
+                onFilterChange={filters => setFilters(filters)}
+              />
+              <Dropdown
+                label="Sort by"
+                items={[
+                  { label: 'Breed A-Z', value: 'breed:asc' },
+                  { label: 'Breed Z-A', value: 'breed:desc' },
+                  { label: 'Name A-Z', value: 'name:asc' },
+                  { label: 'Name Z-A', value: 'name:desc' },
+                  { label: 'Age Young-Older', value: 'age:asc' },
+                  { label: 'Age Older-Younger', value: 'age:desc' },
+                ]}
+                selected={sortBy}
+                onSelectionChange={val => setSortBy(String(val))}
+              />
+            </SpaceBetween>
+            <Pagination
+              openEnded={true}
+              currentPage={currentPage}
+              onCurrentPageChange={setCurrentPage}
+              itemCount={searchedDogs?.length ?? 0}
+              itemsPerPage={Number(filters.pageSize)}
             />
-            <Dropdown
-              label="Sort by"
-              items={[
-                { label: 'Breed A-Z', value: 'breed:asc' },
-                { label: 'Breed Z-A', value: 'breed:desc' },
-                { label: 'Name A-Z', value: 'name:asc' },
-                { label: 'Name Z-A', value: 'name:desc' },
-                { label: 'Age Young-Older', value: 'age:asc' },
-                { label: 'Age Older-Younger', value: 'age:desc' },
-              ]}
-              selected={sortBy}
-              onSelectionChange={val => setSortBy(val)}
-            />
-          </SpaceBetween>
+          </div>
           {searchedDogsError && (
             <Alert
               type="error"
@@ -111,12 +124,15 @@ export function Search() {
             </Alert>
           )}
           {searchedDogsLoading && 'Loading...'}
-          {searchedDogs?.length && (
+
+          {searchedDogs?.length ? (
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
               {searchedDogs.map((dog: Dog) => (
                 <DogCard key={dog.id} {...dog} />
               ))}
             </div>
+          ) : (
+            !searchedDogsLoading && 'No dogs found matching the criteria'
           )}
         </SpaceBetween>
       </ContentBox>

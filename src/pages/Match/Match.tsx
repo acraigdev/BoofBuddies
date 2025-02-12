@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { LayoutFrame } from '../../components/LayoutFrame';
 import { ContentBox } from '../../components/ContentBox';
 import { useQuery } from '@tanstack/react-query';
-import * as dogs from '../../sdk/dogs';
+import * as DogQueries from '../../sdk/DogQueries';
 import { invariant } from 'ts-invariant';
 import { Alert } from '../../components/Alert';
 import { SpaceBetween } from '../../components/SpaceBetween';
@@ -19,8 +19,7 @@ export function Match() {
     error: matchError,
     isLoading: matchLoading,
   } = useQuery({
-    queryKey: ['dogs', matchId],
-    queryFn: () => dogs.listDogs({ ids: [matchId] }),
+    ...DogQueries.listDogsById({ ids: [matchId] }),
     select: res => res[0] as Dog,
   });
 

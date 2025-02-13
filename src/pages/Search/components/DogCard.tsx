@@ -42,13 +42,15 @@ export function DogCard({
         className="rounded-lg w-full object-cover mb-2 aspect-square"
       />
       <h5>{name}</h5>
-      <p>Breed: {breed}</p>
-      <p>
-        Age: {age === 0 ? '< 1 year' : age === 1 ? '1 year' : `${age} years`}
-      </p>
-      <p>
-        Location: {location ? `${location.city}, ${location.state}` : zip_code}
-      </p>
+      <p className="text-gray-500">{breed}</p>
+      <span className="text-sm block">
+        {age === 0 ? 'Puppy' : age === 1 ? '1 year old' : `${age} years old`}
+      </span>
+      <span className="text-sm block">
+        {location
+          ? `${location.city}, ${location.state} ${location?.zip_code}`
+          : zip_code}
+      </span>
     </div>
   );
 }

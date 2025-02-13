@@ -14,6 +14,7 @@ export const zipSearch = ({ zipCodes }: { zipCodes: Array<string> }) => {
     },
   };
 };
+
 // The following body parameters can be supplied to filter the search results. All are optional; if none are provided, the search will match all locations.
 
 // city - the full or partial name of a city

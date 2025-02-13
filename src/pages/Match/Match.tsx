@@ -4,12 +4,12 @@ import { LayoutFrame } from '../../components/LayoutFrame';
 import { ContentBox } from '../../components/ContentBox';
 import { useQuery } from '@tanstack/react-query';
 import * as DogQueries from '../../sdk/DogQueries';
+import * as LocationQueries from '../../sdk/LocationQueries';
 import { invariant } from 'ts-invariant';
 import { Alert } from '../../components/Alert';
 import { SpaceBetween } from '../../components/SpaceBetween';
 import type { Dog } from '../../sdk/types';
 
-// TODO mobile
 export function Match() {
   const { matchId } = useParams();
   invariant(matchId, 'matchId nullish or undefined');
@@ -21,6 +21,12 @@ export function Match() {
   } = useQuery({
     ...DogQueries.listDogsById({ ids: [matchId] }),
     select: res => res[0] as Dog,
+  });
+
+  const { data: location } = useQuery({
+    ...LocationQueries.zipSearch({ zipCodes: [match?.zip_code ?? ''] }),
+    enabled: !!match?.zip_code,
+    select: locations => locations.get(match?.zip_code ?? ''),
   });
 
   return (
@@ -39,9 +45,11 @@ export function Match() {
             </Alert>
           )}
           {match && (
-            // TODO: change to grid for mobile
-            <SpaceBetween size="l" direction="horizontal">
-              <img src={match.img} className="w-1/2" />
+            <div className="flex flex-col md:flex-row gap-5 md:gap-10">
+              <img
+                src={match.img}
+                className="w-full md:max-w-1/2 object-contain"
+              />
               <SpaceBetween size="m">
                 <div>
                   <h2>{match.name}</h2>
@@ -55,13 +63,16 @@ export function Match() {
                   companion for you!
                 </p>
                 <p>
-                  {match.name} is located in zip code {match.zip_code}
+                  {match.name} is located in{' '}
+                  {location
+                    ? `${location.city}, ${location.state} ${location.zip_code}`
+                    : `zip code ${match.zip_code}`}
                 </p>
                 <Link to="/search" className="button">
                   Return to search
                 </Link>
               </SpaceBetween>
-            </SpaceBetween>
+            </div>
           )}
         </SpaceBetween>
       </ContentBox>

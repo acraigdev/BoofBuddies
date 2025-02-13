@@ -36,20 +36,6 @@ class Client {
   }
 
   // API helpers - Location
-  async getLocation({ zipCode }: { zipCode: string }) {
-    if (this.locationMemo.has(zipCode)) return this.locationMemo.get(zipCode);
-
-    const res = await this.send({
-      method: 'POST',
-      api: '/locations',
-      input: {
-        body: [zipCode],
-      },
-    });
-    this.locationMemo.set(zipCode, res);
-    return res;
-  }
-
   async getLocations({ zipCodes }: { zipCodes: Array<string> }) {
     const filteredCodes = zipCodes.filter(zip => !this.locationMemo.has(zip));
 

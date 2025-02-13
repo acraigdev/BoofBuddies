@@ -4,8 +4,8 @@ import { Spinner } from './Spinner';
 
 interface PaginationProps {
   openEnded?: boolean;
-  numberOfPages: number;
-  currentPage: number;
+  numberOfPages: number; // 1-index
+  currentPage: number; // 0-index
   onCurrentPageChange: (page: number) => void;
   isFetchingNextPage?: boolean;
 }
@@ -26,39 +26,67 @@ export function Pagination({
   onCurrentPageChange,
   isFetchingNextPage,
 }: PaginationProps) {
-  // new page, 1 until 5
-  // on 6, ...2-6...
-  // if I click 3, 12345...
-  const pageRange = numberOfPages < 5 ? [0, 5] : [];
+  const buildPages = () => {
+    const pageButtons = [];
+    // if the current page is within the last 3 elements, work backwards
+    // otherwise, keep selection as close to mid as possible
+    const start =
+      numberOfPages - 1 - currentPage <= 2
+        ? numberOfPages - 5
+        : currentPage - 2;
+    for (let i = start; i <= numberOfPages - 1; i++) {
+      // No more than 5 pages
+      if (pageButtons.length === 5) break;
+      if (i < 0) continue;
+      pageButtons.push(
+        <PageButton
+          key={i}
+          page={i}
+          isActive={i === currentPage && !isFetchingNextPage}
+          onPageClick={onCurrentPageChange}
+        />,
+      );
+    }
+    return pageButtons;
+  };
   return (
-    <SpaceBetween direction="horizontal" size="sm" alignOverride="items-center">
+    <SpaceBetween direction="horizontal" size="m" alignOverride="items-center">
       <button
         className="link"
         disabled={currentPage === 0}
         onClick={() => onCurrentPageChange(currentPage - 1)}
       >
-        ← Previous
+        ← <span className="hidden sm:inline">Previous</span>
       </button>
-      {Array.from(Array(numberOfPages).keys()).map(i => (
-        <button
-          key={i}
-          className={
-            currentPage === i && !isFetchingNextPage ? 'primary small' : 'link'
-          }
-          onClick={() => onCurrentPageChange(i)}
-        >
-          {i + 1}
-        </button>
-      ))}
-      {isFetchingNextPage && <Spinner className="size-4" />}
+      {buildPages()}
+      {isFetchingNextPage && <Spinner svgClassName="size-4" />}
       {openEnded && <span>...</span>}
       <button
         className="link"
         disabled={currentPage === numberOfPages - 1 && !openEnded}
         onClick={() => onCurrentPageChange(currentPage + 1)}
       >
-        Next →
+        <span className="hidden sm:inline">Next</span> →
       </button>
     </SpaceBetween>
+  );
+}
+
+function PageButton({
+  isActive,
+  page,
+  onPageClick,
+}: {
+  isActive?: boolean;
+  page: number;
+  onPageClick: (onPageClick: number) => void;
+}) {
+  return (
+    <button
+      className={isActive ? 'primary small' : 'link'}
+      onClick={() => onPageClick(page)}
+    >
+      {page + 1}
+    </button>
   );
 }

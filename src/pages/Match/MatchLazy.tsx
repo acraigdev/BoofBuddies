@@ -9,7 +9,7 @@ const Match = lazy(() =>
 
 export function MatchLazy() {
   return (
-    <Suspense fallback={<Spinner className="w-8 h-8" />}>
+    <Suspense fallback={<Spinner isDefault />}>
       <Match />
     </Suspense>
   );

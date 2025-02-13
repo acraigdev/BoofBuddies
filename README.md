@@ -18,3 +18,4 @@ it will be hosted at localhost:8080
 Questions:
 
 - Does age range have a cap?
+- Max number of zips/breed filters?

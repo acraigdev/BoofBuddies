@@ -1,13 +1,24 @@
 // https://flowbite.com/docs/components/spinner/
 import React from 'react';
 
-export function Spinner({ className }: { className?: string }) {
+export function Spinner({
+  className,
+  svgClassName,
+  isDefault,
+}: {
+  className?: string;
+  svgClassName?: string;
+  isDefault?: boolean;
+}) {
   return (
     // TODO: Center
-    <div role="status">
+    <div
+      role="status"
+      className={isDefault ? 'flex justify-center mt-10' : (className ?? '')}
+    >
       <svg
         aria-hidden="true"
-        className={`text-gray-200 animate-spin dark:text-gray-600 fill-blue-600 ${className ?? ''}`}
+        className={`text-gray-200 animate-spin dark:text-gray-600 fill-blue-600 ${svgClassName ?? 'size-15'}`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

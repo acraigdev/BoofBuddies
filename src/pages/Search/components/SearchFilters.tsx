@@ -103,7 +103,6 @@ export function SearchFilters({
                   }))}
                 />
               </div>
-              {/* TODO - limit */}
               <MultiInput
                 values={formFilters.zipCodes}
                 onValuesChange={values =>
@@ -114,7 +113,6 @@ export function SearchFilters({
                 validate={val => Boolean(!!val && /^\d{5}$/.test(val))}
                 placeholder="12345"
               />
-              {/* TODO - limit */}
               <MultiSelect
                 selected={formFilters.breeds}
                 onSelectionChange={val =>
@@ -125,6 +123,7 @@ export function SearchFilters({
                 }
                 options={breedOptions}
                 label="Breeds"
+                placeholder="Filter by breed"
               />
               <div className="w-full flex justify-end gap-4">
                 <button className="link" onClick={() => setShowMenu(false)}>

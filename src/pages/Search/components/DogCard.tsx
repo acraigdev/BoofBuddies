@@ -11,7 +11,7 @@ export function DogCard({ id, age, breed, img, name, zip_code }: Dog) {
 
   return (
     <div
-      className={`${isFavoriteDog && 'bg-blue-100'} border border-gray-light shadow-lg p-2 rounded-lg relative`}
+      className={`${isFavoriteDog && 'bg-blue-100'} border border-gray-light shadow-lg p-4 rounded-lg relative`}
     >
       <button
         className={`${isFavoriteDog ? 'bg-blue' : 'border border-gray-200 bg-gray-100'} inline-block rounded-full absolute right-1 top-1 p-2 cursor-pointer`}

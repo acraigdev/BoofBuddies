@@ -11,6 +11,7 @@ interface MultiSelectProps {
   onSelectionChange: (selected: Set<string>) => void;
   options: Set<string>;
   label: string;
+  placeholder?: string;
 }
 
 export function MultiSelect({
@@ -18,14 +19,13 @@ export function MultiSelect({
   onSelectionChange,
   label,
   options,
+  placeholder,
 }: MultiSelectProps) {
   const id = `multiselect-${uuidv4()}`;
   const clickRef = useRef<HTMLDivElement>(null);
   const [search, setSearch] = useState('');
   const [optionsOpen, setOptionsOpen] = useState(false);
-  const openOptions = () => {
-    setOptionsOpen(!optionsOpen);
-  };
+
   const { refs, floatingStyles } = useFloating({
     open: optionsOpen,
     placement: 'bottom-start',
@@ -64,6 +64,7 @@ export function MultiSelect({
               return;
             }
           }}
+          placeholder={placeholder}
         />
         <Icons.Chevron className="size-3 rotate-180 absolute top-0 bottom-0 right-2 my-auto text-gray-500" />
       </div>

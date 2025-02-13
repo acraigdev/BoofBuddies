@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { LayoutFrame } from '../../components/LayoutFrame';
 import { ContentBox } from '../../components/ContentBox';
 import * as DogQueries from '../../sdk/DogQueries';
@@ -49,9 +49,16 @@ export function Search() {
       zipCodes: filters.zipCodes,
       age: filters.age,
     }),
+    suspense: true,
     initialPageParam: null,
     getNextPageParam: lastPage => lastPage.next,
   });
+
+  useLayoutEffect(() => {
+    if (hasNextPage && searchedDogs.pages.length < 3) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage, searchedDogs.pages.length]);
 
   const dogPage = useMemo(() => {
     if (isFetchingNextPage) {
@@ -72,8 +79,10 @@ export function Search() {
     },
   });
 
+  console.log(searchedDogs);
+
   const handlePageChange = (newPage: number) => {
-    if (!searchedDogs?.pages[newPage]) {
+    if (!searchedDogs?.pages?.[newPage]) {
       fetchNextPage();
     }
     setCurrentPage(newPage);
@@ -99,11 +108,12 @@ export function Search() {
               Match me
             </button>
           </div>
-          <div className="flex justify-between items-center">
+          <div className="sm:flex justify-between items-center">
             <SpaceBetween
               size="m"
               direction="horizontal"
               alignOverride="items-end"
+              className="mb-4 sm:mb-0"
             >
               <SearchFilters
                 filters={filters}
@@ -123,13 +133,15 @@ export function Search() {
                 onSelectionChange={val => setSortBy(String(val))}
               />
             </SpaceBetween>
-            <Pagination
-              openEnded={hasNextPage}
-              currentPage={currentPage}
-              onCurrentPageChange={newPage => handlePageChange(newPage)}
-              numberOfPages={searchedDogs.pages.length}
-              isFetchingNextPage={isFetchingNextPage}
-            />
+            {dogPage?.length && (
+              <Pagination
+                openEnded={hasNextPage}
+                currentPage={currentPage}
+                onCurrentPageChange={newPage => handlePageChange(newPage)}
+                numberOfPages={searchedDogs.pages?.length ?? 0}
+                isFetchingNextPage={isFetchingNextPage}
+              />
+            )}
           </div>
           {searchedDogsError && (
             <Alert
@@ -145,7 +157,7 @@ export function Search() {
           {searchedDogsLoading && 'Loading...'}
 
           {dogPage?.length ? (
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {dogPage.map((dog: Dog) => (
                 <DogCard key={dog.id} {...dog} />
               ))}
@@ -159,7 +171,7 @@ export function Search() {
             openEnded={hasNextPage}
             currentPage={currentPage}
             onCurrentPageChange={newPage => handlePageChange(newPage)}
-            numberOfPages={searchedDogs.pages.length}
+            numberOfPages={searchedDogs.pages?.length ?? 0}
             isFetchingNextPage={isFetchingNextPage}
           />
         </SpaceBetween>

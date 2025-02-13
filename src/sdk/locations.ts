@@ -1,11 +1,11 @@
 import { fetchApiClient } from './client';
 
-export const zipSearch = async ({ zipcodes }: { zipcodes: Array<string> }) => {
-  return await fetchApiClient.post({
-    api: '/locations',
-    input: { body: zipcodes },
-  });
-};
+// export const zipSearch = async ({ zipcodes }: { zipcodes: Array<string> }) => {
+//   return await fetchApiClient.post({
+//     api: '/locations',
+//     input: { body: zipcodes },
+//   });
+// };
 
 // The following body parameters can be supplied to filter the search results. All are optional; if none are provided, the search will match all locations.
 

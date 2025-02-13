@@ -9,7 +9,7 @@ const Login = lazy(() =>
 
 export function LoginLazy() {
   return (
-    <Suspense fallback={<Spinner />}>
+    <Suspense fallback={<Spinner className="w-8 h-8" />}>
       <Login />
     </Suspense>
   );

@@ -1,13 +1,13 @@
 // https://flowbite.com/docs/components/spinner/
 import React from 'react';
 
-export function Spinner() {
+export function Spinner({ className }: { className?: string }) {
   return (
     // TODO: Center
-    <div role="status" className="m-6 w-full text-center">
+    <div role="status">
       <svg
         aria-hidden="true"
-        className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+        className={`text-gray-200 animate-spin dark:text-gray-600 fill-blue-600 ${className ?? ''}`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

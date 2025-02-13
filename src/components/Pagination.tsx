@@ -1,12 +1,13 @@
 import React from 'react';
 import { SpaceBetween } from './SpaceBetween';
+import { Spinner } from './Spinner';
 
 interface PaginationProps {
   openEnded?: boolean;
-  itemsPerPage: number;
-  itemCount: number;
+  numberOfPages: number;
   currentPage: number;
   onCurrentPageChange: (page: number) => void;
+  isFetchingNextPage?: boolean;
 }
 
 /**
@@ -20,29 +21,41 @@ interface PaginationProps {
 
 export function Pagination({
   openEnded,
-  itemsPerPage,
-  itemCount,
+  numberOfPages,
   currentPage,
   onCurrentPageChange,
+  isFetchingNextPage,
 }: PaginationProps) {
-  const numberOfPages = itemCount / itemsPerPage;
+  // new page, 1 until 5
+  // on 6, ...2-6...
+  // if I click 3, 12345...
+  const pageRange = numberOfPages < 5 ? [0, 5] : [];
   return (
-    <SpaceBetween direction="horizontal" size="sm">
-      <button className="link" disabled={currentPage === 0}>
+    <SpaceBetween direction="horizontal" size="sm" alignOverride="items-center">
+      <button
+        className="link"
+        disabled={currentPage === 0}
+        onClick={() => onCurrentPageChange(currentPage - 1)}
+      >
         ← Previous
       </button>
-      {new Array(numberOfPages).fill('').map((_x, i) => (
+      {Array.from(Array(numberOfPages).keys()).map(i => (
         <button
           key={i}
-          className={currentPage === i ? 'primary small' : 'link'}
+          className={
+            currentPage === i && !isFetchingNextPage ? 'primary small' : 'link'
+          }
+          onClick={() => onCurrentPageChange(i)}
         >
           {i + 1}
         </button>
       ))}
+      {isFetchingNextPage && <Spinner className="size-4" />}
       {openEnded && <span>...</span>}
       <button
         className="link"
         disabled={currentPage === numberOfPages - 1 && !openEnded}
+        onClick={() => onCurrentPageChange(currentPage + 1)}
       >
         Next →
       </button>

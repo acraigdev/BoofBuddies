@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { LayoutFrame } from '../../components/LayoutFrame';
 import { ContentBox } from '../../components/ContentBox';
 import * as DogQueries from '../../sdk/DogQueries';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { Dropdown } from '../../components/Dropdown';
 import { SpaceBetween } from '../../components/SpaceBetween';
 import { Alert } from '../../components/Alert';
@@ -14,13 +14,13 @@ import { queryClient } from '../../utils/queryClient';
 import { SearchFilters } from './components/SearchFilters';
 import { fetchApiClient } from '../../sdk/client';
 import { Pagination } from '../../components/Pagination';
-import type { Maybe } from '../../utils/typeHelpers';
 
 // TODO:
 // queryFactory
 // pagination
 // stretch: image hover popover
 // large screen wider + 4
+// go to top button
 
 export function Search() {
   const navigate = useNavigate();
@@ -34,12 +34,14 @@ export function Search() {
   }));
   const [currentPage, setCurrentPage] = useState(0);
 
-  // TODO: infinite
   const {
     data: searchedDogs,
     error: searchedDogsError,
     isLoading: searchedDogsLoading,
-  } = useQuery<Maybe<Array<Dog>>>({
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
     ...DogQueries.searchDogs({
       size: String(filters.pageSize),
       sort: sortBy,
@@ -47,11 +49,21 @@ export function Search() {
       zipCodes: filters.zipCodes,
       age: filters.age,
     }),
+    initialPageParam: null,
+    getNextPageParam: lastPage => lastPage.next,
   });
+
+  const dogPage = useMemo(() => {
+    if (isFetchingNextPage) {
+      return searchedDogs?.pages?.[currentPage - 1]?.dogs;
+    }
+    return searchedDogs?.pages?.[currentPage]?.dogs;
+  }, [currentPage, searchedDogs?.pages, isFetchingNextPage]);
 
   const { mutateAsync: findMatch } = useMutation({
     mutationFn: async () =>
-      await fetchApiClient.post({
+      await fetchApiClient.send({
+        method: 'POST',
         api: '/dogs/match',
         input: { body: Array.from(favoriteDogs) },
       }),
@@ -59,6 +71,13 @@ export function Search() {
       navigate(generatePath('/match/:matchId', { matchId: res.match }));
     },
   });
+
+  const handlePageChange = (newPage: number) => {
+    if (!searchedDogs?.pages[newPage]) {
+      fetchNextPage();
+    }
+    setCurrentPage(newPage);
+  };
 
   return (
     <LayoutFrame>
@@ -105,11 +124,11 @@ export function Search() {
               />
             </SpaceBetween>
             <Pagination
-              openEnded={true}
+              openEnded={hasNextPage}
               currentPage={currentPage}
-              onCurrentPageChange={setCurrentPage}
-              itemCount={searchedDogs?.length ?? 0}
-              itemsPerPage={Number(filters.pageSize)}
+              onCurrentPageChange={newPage => handlePageChange(newPage)}
+              numberOfPages={searchedDogs.pages.length}
+              isFetchingNextPage={isFetchingNextPage}
             />
           </div>
           {searchedDogsError && (
@@ -125,15 +144,24 @@ export function Search() {
           )}
           {searchedDogsLoading && 'Loading...'}
 
-          {searchedDogs?.length ? (
+          {dogPage?.length ? (
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {searchedDogs.map((dog: Dog) => (
+              {dogPage.map((dog: Dog) => (
                 <DogCard key={dog.id} {...dog} />
               ))}
             </div>
           ) : (
-            !searchedDogsLoading && 'No dogs found matching the criteria'
+            !searchedDogsLoading &&
+            !isFetchingNextPage &&
+            'No dogs found matching the criteria'
           )}
+          <Pagination
+            openEnded={hasNextPage}
+            currentPage={currentPage}
+            onCurrentPageChange={newPage => handlePageChange(newPage)}
+            numberOfPages={searchedDogs.pages.length}
+            isFetchingNextPage={isFetchingNextPage}
+          />
         </SpaceBetween>
       </ContentBox>
     </LayoutFrame>

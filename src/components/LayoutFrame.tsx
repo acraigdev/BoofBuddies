@@ -17,7 +17,7 @@ export function LayoutFrame({ children }: LayoutFrameProps) {
 
   const isLogin = matchPath('/', pathname);
   const { mutate: logout } = useMutation({
-    mutationFn: async () => await fetchApiClient.post({ api: '/auth/logout' }),
+    mutationFn: async () => await fetchApiClient.logout(),
     onSuccess: () => {
       navigate('/');
     },

@@ -9,7 +9,7 @@ const Search = lazy(() =>
 
 export function SearchLazy() {
   return (
-    <Suspense fallback={<Spinner />}>
+    <Suspense fallback={<Spinner className="w-8 h-8" />}>
       <Search />
     </Suspense>
   );

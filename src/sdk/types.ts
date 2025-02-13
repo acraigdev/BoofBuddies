@@ -9,6 +9,11 @@ export interface Dog {
   breed: string;
 }
 
+export interface SearchDogResult {
+  dogs: Array<Dog>;
+  next?: string;
+}
+
 export type Filters = {
   pageSize: number;
   zipCodes: Set<string>;

@@ -21,14 +21,9 @@ export function Login() {
 
   const { mutateAsync: authenticate } = useMutation({
     mutationFn: async () =>
-      await fetchApiClient.post({
-        api: '/auth/login',
-        input: {
-          body: {
-            name,
-            email,
-          },
-        },
+      await fetchApiClient.login({
+        name,
+        email,
       }),
     onSuccess: () => {
       navigate('/search');
@@ -56,7 +51,7 @@ export function Login() {
             auth();
           }}
         >
-          <SpaceBetween size="l">
+          <SpaceBetween size="m">
             <h4>Find your new best friend</h4>
             {searchParams.get('expired') && (
               <SpaceBetween

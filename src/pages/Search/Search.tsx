@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useState } from 'react';
+import React, { Suspense, useLayoutEffect, useMemo, useState } from 'react';
 import { LayoutFrame } from '../../components/LayoutFrame';
 import { ContentBox } from '../../components/ContentBox';
 import * as DogQueries from '../../sdk/DogQueries';
@@ -15,6 +15,7 @@ import { queryClient } from '../../utils/queryClient';
 import { SearchFilters } from './components/SearchFilters';
 import { fetchApiClient } from '../../sdk/client';
 import { Pagination } from '../../components/Pagination';
+import { Icons } from '../../components/Icons';
 
 // TODO:
 // queryFactory
@@ -34,6 +35,7 @@ export function Search() {
     breeds: new Set<string>(),
   }));
   const [currentPage, setCurrentPage] = useState(0);
+  const [showMenu, setShowMenu] = useState(false);
 
   const {
     data: searchedDogs,
@@ -102,7 +104,7 @@ export function Search() {
 
   return (
     <LayoutFrame>
-      <ContentBox className="w-full lg:w-3/4">
+      <ContentBox className="w-full lg:w-3/4" inert={showMenu}>
         <SpaceBetween size="m">
           <div className="sm:flex justify-between items-center">
             <div className="basis-3/4 mb-2">
@@ -127,13 +129,13 @@ export function Search() {
               alignOverride="items-end"
               className="mb-4 sm:mb-0"
             >
-              <SearchFilters
-                filters={filters}
-                onFilterChange={filters => {
-                  setCurrentPage(0);
-                  setFilters(filters);
-                }}
-              />
+              <button
+                type="button"
+                className="primary icon"
+                onClick={() => setShowMenu(true)}
+              >
+                <Icons.Filter className="size-6" />
+              </button>
               <Dropdown
                 label="Sort by"
                 items={[
@@ -187,16 +189,30 @@ export function Search() {
             'No dogs found matching the criteria'
           )}
           {!!dogPage?.length && (
-            <Pagination
-              openEnded={hasNextPage}
-              currentPage={currentPage}
-              onCurrentPageChange={newPage => handlePageChange(newPage)}
-              numberOfPages={searchedDogs.pages?.length ?? 0}
-              isFetchingNextPage={isFetchingNextPage}
-            />
+            <div className="flex justify-end">
+              <Pagination
+                openEnded={hasNextPage}
+                currentPage={currentPage}
+                onCurrentPageChange={newPage => handlePageChange(newPage)}
+                numberOfPages={searchedDogs.pages?.length ?? 0}
+                isFetchingNextPage={isFetchingNextPage}
+              />
+            </div>
           )}
         </SpaceBetween>
       </ContentBox>
+      {showMenu && (
+        <Suspense>
+          <SearchFilters
+            filters={filters}
+            onFilterChange={filters => {
+              setCurrentPage(0);
+              setFilters(filters);
+            }}
+            onDismiss={() => setShowMenu(false)}
+          />
+        </Suspense>
+      )}
     </LayoutFrame>
   );
 }

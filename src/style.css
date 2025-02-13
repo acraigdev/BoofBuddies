@@ -10,6 +10,9 @@
 
 body {
   @apply font-body bg-gray-light m-0;
+  :focus-visible {
+    @apply ring-blue-500 border-blue-500 outline-blue-500;
+  }
 }
 
 .scrollbar::-webkit-scrollbar {
@@ -66,7 +69,7 @@ button {
   &.primary {
     @apply bg-gray-dark text-white py-2 px-4 rounded-lg text-lg cursor-pointer;
     &.small {
-      @apply px-2 py-0;
+      @apply font-body px-2 py-0;
     }
   }
 
@@ -94,6 +97,6 @@ button {
   }
 
   &.icon {
-    @apply p-2 rounded-full;
+    @apply p-2 rounded-full cursor-pointer;
   }
 }

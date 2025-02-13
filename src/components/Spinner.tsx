@@ -11,7 +11,6 @@ export function Spinner({
   isDefault?: boolean;
 }) {
   return (
-    // TODO: Center
     <div
       role="status"
       className={isDefault ? 'flex justify-center mt-10' : (className ?? '')}

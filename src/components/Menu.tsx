@@ -9,11 +9,6 @@ interface MenuProps {
   title: string;
 }
 
-/**
- * TODO:
- * Prevent tabbing outside of Menu
- */
-
 export function Menu({ onDismiss, children, title }: MenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   useOuterClickHandler({

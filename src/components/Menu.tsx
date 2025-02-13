@@ -29,7 +29,7 @@ export function Menu({ onDismiss, children, title }: MenuProps) {
       >
         <div className="flex justify-between items-center">
           <h3>{title}</h3>
-          <button className="icon" onClick={() => onDismiss()}>
+          <button type="button" className="icon" onClick={() => onDismiss()}>
             <Icons.XMark className="size-6 float-right" />
           </button>
         </div>

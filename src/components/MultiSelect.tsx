@@ -51,7 +51,12 @@ export function MultiSelect({
       <label htmlFor={id} className="block mb-2">
         <p>{label}</p>
       </label>
-      <div className="relative" id={id} ref={refs.setReference}>
+      <div
+        className="relative"
+        id={id}
+        ref={refs.setReference}
+        onClick={() => setOptionsOpen(true)}
+      >
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -130,6 +135,7 @@ function Option({
 }) {
   return (
     <button
+      type="button"
       tabIndex={0}
       className="z-1 p-2 cursor-pointer text-left"
       onClick={() => onChecked(!checked)}

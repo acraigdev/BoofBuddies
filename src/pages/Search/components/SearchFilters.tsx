@@ -40,7 +40,11 @@ export function SearchFilters({
 
   return (
     <>
-      <button className="primary icon" onClick={() => setShowMenu(true)}>
+      <button
+        type="button"
+        className="primary icon"
+        onClick={() => setShowMenu(true)}
+      >
         <Icons.Filter className="size-6" />
       </button>
       {showMenu && (
@@ -112,6 +116,7 @@ export function SearchFilters({
                 description="Type a zipcode and press enter or + to add it to the filter"
                 validate={val => Boolean(!!val && /^\d{5}$/.test(val))}
                 placeholder="12345"
+                validationError="Enter a valid zipcode"
               />
               <MultiSelect
                 selected={formFilters.breeds}
@@ -126,7 +131,11 @@ export function SearchFilters({
                 placeholder="Filter by breed"
               />
               <div className="w-full flex justify-end gap-4">
-                <button className="link" onClick={() => setShowMenu(false)}>
+                <button
+                  type="button"
+                  className="link"
+                  onClick={() => setShowMenu(false)}
+                >
                   <p>Cancel</p>
                 </button>
                 <button className="primary" formAction="submit">

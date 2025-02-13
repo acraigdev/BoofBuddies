@@ -71,11 +71,15 @@ export function TextInput({
             ref={inputRef}
             placeholder={placeholder}
             onKeyDown={e => {
-              if (e.key === 'Enter') onEnter?.();
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                onEnter?.();
+              }
             }}
           />
           {!!onEnter && (
             <button
+              type="button"
               className="cursor-pointer bg-blue border-none rounded-full px-2 text-xl text-white font-bold absolute right-2 top-2"
               onClick={() => onEnter?.()}
               aria-label="Add item"

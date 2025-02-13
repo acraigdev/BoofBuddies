@@ -88,7 +88,7 @@ export function Login() {
               validationError={'Enter a valid email.'}
               placeholder="moxxi.ryn@gmail.com"
             />
-            <button type="submit" className="primary block m-auto">
+            <button type="submit" className="primary block mx-auto mt-2">
               Find my match
             </button>
           </SpaceBetween>

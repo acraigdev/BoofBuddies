@@ -1,9 +1,22 @@
 import React from 'react';
-import type { Dog } from '../../../sdk/types';
+import type { Dog, DogLocation } from '../../../sdk/types';
 import { useFavoriteDogContext } from '../../../utils/FavoriteDogContext';
 import { Icons } from '../../../components/Icons';
+import type { Maybe } from '../../../utils/typeHelpers';
 
-export function DogCard({ id, age, breed, img, name, zip_code }: Dog) {
+interface DogCardProps extends Dog {
+  location: Maybe<DogLocation>;
+}
+
+export function DogCard({
+  id,
+  age,
+  breed,
+  img,
+  name,
+  zip_code,
+  location,
+}: DogCardProps) {
   const { favoriteDogs, addFavoriteDog, removeFavoriteDog } =
     useFavoriteDogContext();
 
@@ -33,7 +46,9 @@ export function DogCard({ id, age, breed, img, name, zip_code }: Dog) {
       <p>
         Age: {age === 0 ? '< 1 year' : age === 1 ? '1 year' : `${age} years`}
       </p>
-      <p>Location: {zip_code}</p>
+      <p>
+        Location: {location ? `${location.city}, ${location.state}` : zip_code}
+      </p>
     </div>
   );
 }

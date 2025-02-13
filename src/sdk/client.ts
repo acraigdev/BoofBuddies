@@ -1,11 +1,11 @@
 import type { Nullable } from '../utils/typeHelpers';
-import type { Dog, SearchDogResult } from './types';
+import type { Dog, DogLocation, SearchDogResult } from './types';
 
 export const client = 'https://frontend-take-home-service.fetch.com';
 
 interface Input {
   body?: Record<string, any>;
-  query?: Record<string, string>;
+  query?: Record<string, string | Array<string>>;
 }
 
 const headers = {
@@ -14,14 +14,58 @@ const headers = {
 
 class Client {
   private base: string;
+  private locationMemo: Map<string, DogLocation>;
 
   constructor() {
     this.base = 'https://frontend-take-home-service.fetch.com';
+    this.locationMemo = new Map<string, DogLocation>();
   }
 
-  buildQueryString(queries?: Record<string, string>) {
+  buildQueryString(queries?: Record<string, string | Array<string>>) {
+    const params = new URLSearchParams();
     if (!queries) return '';
-    return new URLSearchParams(queries).toString();
+    Object.keys(queries).forEach(key => {
+      const value = queries[key];
+      if (typeof value === 'string') {
+        params.append(key, value);
+        return;
+      }
+      value.forEach(v => params.append(key, v));
+    });
+    return new URLSearchParams(params).toString();
+  }
+
+  // API helpers - Location
+  async getLocation({ zipCode }: { zipCode: string }) {
+    if (this.locationMemo.has(zipCode)) return this.locationMemo.get(zipCode);
+
+    const res = await this.send({
+      method: 'POST',
+      api: '/locations',
+      input: {
+        body: [zipCode],
+      },
+    });
+    this.locationMemo.set(zipCode, res);
+    return res;
+  }
+
+  async getLocations({ zipCodes }: { zipCodes: Array<string> }) {
+    const filteredCodes = zipCodes.filter(zip => !this.locationMemo.has(zip));
+
+    if (filteredCodes) {
+      const res = await this.send({
+        method: 'POST',
+        api: '/locations',
+        input: {
+          body: filteredCodes,
+        },
+      });
+      res.forEach((location: DogLocation) =>
+        this.locationMemo.set(location.zip_code, location),
+      );
+    }
+    return this.locationMemo;
   }
 
   // API helpers - Dog
@@ -59,8 +103,8 @@ class Client {
       pageParam,
       input: {
         query: {
-          ...(breeds?.size && { breeds: [...breeds].join(',') }),
-          ...(zipCodes?.size && { zipCodes: [...zipCodes].join(',') }),
+          ...(breeds?.size && { breeds: [...breeds] }),
+          ...(zipCodes?.size && { zipCodes: [...zipCodes] }),
           ...((age?.max || age?.min) && {
             ...(age.min && { ageMin: String(age.min) }),
             ...(age.max && { ageMax: String(age.max) }),
@@ -117,22 +161,24 @@ class Client {
         credentials: 'include',
         headers,
       },
-    ).then((res: Response) => {
-      if (res.status === 401) {
-        window.location.replace('?expired=true');
-      }
-      if (res.status !== 200) {
-        return res.text().then((text: string) => {
-          throw new Error(text);
-        });
-      }
-      const contentType = res.headers.get('content-type');
-      if (contentType && contentType.indexOf('application/json') !== -1) {
-        return res.json();
-      } else {
-        return res.text();
-      }
-    });
+    )
+      .then((res: Response) => {
+        if (res.status === 401) {
+          window.location.replace('?expired=true');
+        }
+        if (res.status !== 200) {
+          return res.text().then((text: string) => {
+            throw new Error(text);
+          });
+        }
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.indexOf('application/json') !== -1) {
+          return res.json();
+        } else {
+          return res.text();
+        }
+      })
+      .catch(err => console.error({ err }));
   }
 }
 

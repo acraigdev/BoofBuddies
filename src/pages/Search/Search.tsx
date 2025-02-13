@@ -2,7 +2,8 @@ import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { LayoutFrame } from '../../components/LayoutFrame';
 import { ContentBox } from '../../components/ContentBox';
 import * as DogQueries from '../../sdk/DogQueries';
-import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
+import * as LocationQueries from '../../sdk/LocationQueries';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import { Dropdown } from '../../components/Dropdown';
 import { SpaceBetween } from '../../components/SpaceBetween';
 import { Alert } from '../../components/Alert';
@@ -50,6 +51,12 @@ export function Search() {
       age: filters.age,
     }),
     suspense: true,
+    select: res => {
+      return {
+        ...res,
+        pages: res.pages.filter(page => !!page.dogs.length),
+      };
+    },
     initialPageParam: null,
     getNextPageParam: lastPage => lastPage.next,
   });
@@ -67,6 +74,13 @@ export function Search() {
     return searchedDogs?.pages?.[currentPage]?.dogs;
   }, [currentPage, searchedDogs?.pages, isFetchingNextPage]);
 
+  const { data: locations } = useQuery({
+    ...LocationQueries.zipSearch({
+      zipCodes: (dogPage ?? []).map(dog => dog.zip_code),
+    }),
+    enabled: !!dogPage?.length,
+  });
+
   const { mutateAsync: findMatch } = useMutation({
     mutationFn: async () =>
       await fetchApiClient.send({
@@ -78,8 +92,6 @@ export function Search() {
       navigate(generatePath('/match/:matchId', { matchId: res.match }));
     },
   });
-
-  console.log(searchedDogs);
 
   const handlePageChange = (newPage: number) => {
     if (!searchedDogs?.pages?.[newPage]) {
@@ -117,7 +129,10 @@ export function Search() {
             >
               <SearchFilters
                 filters={filters}
-                onFilterChange={filters => setFilters(filters)}
+                onFilterChange={filters => {
+                  setCurrentPage(0);
+                  setFilters(filters);
+                }}
               />
               <Dropdown
                 label="Sort by"
@@ -133,7 +148,7 @@ export function Search() {
                 onSelectionChange={val => setSortBy(String(val))}
               />
             </SpaceBetween>
-            {dogPage?.length && (
+            {!!dogPage?.length && (
               <Pagination
                 openEnded={hasNextPage}
                 currentPage={currentPage}
@@ -159,7 +174,11 @@ export function Search() {
           {dogPage?.length ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {dogPage.map((dog: Dog) => (
-                <DogCard key={dog.id} {...dog} />
+                <DogCard
+                  key={dog.id}
+                  {...dog}
+                  location={locations?.get(dog.zip_code)}
+                />
               ))}
             </div>
           ) : (
@@ -167,13 +186,15 @@ export function Search() {
             !isFetchingNextPage &&
             'No dogs found matching the criteria'
           )}
-          <Pagination
-            openEnded={hasNextPage}
-            currentPage={currentPage}
-            onCurrentPageChange={newPage => handlePageChange(newPage)}
-            numberOfPages={searchedDogs.pages?.length ?? 0}
-            isFetchingNextPage={isFetchingNextPage}
-          />
+          {!!dogPage?.length && (
+            <Pagination
+              openEnded={hasNextPage}
+              currentPage={currentPage}
+              onCurrentPageChange={newPage => handlePageChange(newPage)}
+              numberOfPages={searchedDogs.pages?.length ?? 0}
+              isFetchingNextPage={isFetchingNextPage}
+            />
+          )}
         </SpaceBetween>
       </ContentBox>
     </LayoutFrame>

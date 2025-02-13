@@ -21,7 +21,7 @@ export type Filters = {
   breeds: Set<string>;
 };
 
-export interface Location {
+export interface DogLocation {
   zip_code: string;
   latitude: number;
   longitude: number;

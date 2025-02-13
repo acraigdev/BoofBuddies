@@ -18,6 +18,7 @@ interface SearchFiltersProps {
 /**
  * Enhancements:
  * - Save filters as query string so they dont get lost on nav
+ * - Use /locations/search with results from /dogs to filter further
  */
 export function SearchFilters({
   filters: { pageSize, zipCodes, age, breeds },
@@ -54,7 +55,8 @@ export function SearchFilters({
                 pageSize: Number(val),
               })
             }
-            range={{ min: 10, max: 100 }} // TODO check docs
+            // Max 100 since /locations and /dogs support up to 100
+            range={{ min: 10, max: 100 }}
             label="Items per page"
             className="w-full cursor-pointer"
           />

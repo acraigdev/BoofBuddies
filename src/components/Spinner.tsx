@@ -1,4 +1,4 @@
-// https://flowbite.com/docs/components/spinner/
+// svg from https://flowbite.com/docs/components/spinner/
 import React from 'react';
 
 export function Spinner({

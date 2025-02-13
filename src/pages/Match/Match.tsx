@@ -56,7 +56,7 @@ export function Match() {
                   <p className="text-lg text-gray-600">{match.breed}</p>
                 </div>
                 {/* This would localize horribly, but ideally a description of some sort
-                would be available through a separate API! */}
+                would be available through a separate API */}
                 <p>
                   {match.name} is a {match.age} year old {match.breed}! Based on
                   your favorite dogs, we think {match.name} will be the perfect

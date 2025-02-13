@@ -32,7 +32,6 @@ export const zipSearch = ({ zipCodes }: { zipCodes: Array<string> }) => {
 // size - the number of results to return; defaults to 25 if omitted
 // from - a cursor to be used when paginating results (optional)
 // The maximum total number of ZIP codes that will be matched by a single query is 10,000.
-// TODO
 // export const locationSearch = async ({
 //   zipcodes,
 // }: {

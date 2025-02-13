@@ -12,9 +12,8 @@ import { fetchApiClient } from '../../sdk/client';
 export function Login() {
   const navigate = useNavigate();
   const [searchParams, _setSearchParams] = useSearchParams();
-  // TODO clean
-  const [name, setName] = useState('Moxxi');
-  const [email, setEmail] = useState('moxxi@gmail.com');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
 
   const nameDelegate = useRef<ValidationDelegate>(null);
   const emailDelegate = useRef<ValidationDelegate>(null);
@@ -51,12 +50,12 @@ export function Login() {
             auth();
           }}
         >
-          <SpaceBetween size="m">
+          <SpaceBetween size="sm">
             <h4>Find your new best friend</h4>
             {searchParams.get('expired') && (
               <SpaceBetween
                 direction="horizontal"
-                size="xs"
+                size="sm"
                 className="text-red-700"
               >
                 <Icons.Error className="size-4" />

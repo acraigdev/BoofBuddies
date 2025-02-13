@@ -71,7 +71,7 @@ export function TextInput({
             ref={inputRef}
             placeholder={placeholder}
             onKeyDown={e => {
-              if (e.key === 'Enter') {
+              if (!!onEnter && e.key === 'Enter') {
                 e.preventDefault();
                 onEnter?.();
               }
@@ -103,7 +103,11 @@ export function TextInput({
         />
       )}
       {isError && (
-        <SpaceBetween direction="horizontal" size="xs" className="text-red-700">
+        <SpaceBetween
+          direction="horizontal"
+          size="xs"
+          className="text-red-700 mt-1"
+        >
           <Icons.Error className="size-4" />
           <span className="text-sm">{validationError}</span>
         </SpaceBetween>

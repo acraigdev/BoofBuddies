@@ -17,12 +17,11 @@ import { fetchApiClient } from '../../sdk/client';
 import { Pagination } from '../../components/Pagination';
 import { Icons } from '../../components/Icons';
 
-// TODO:
-// queryFactory
-// pagination
-// stretch: image hover popover
-// large screen wider + 4
-// go to top button
+/**
+ * Enhancements:
+ * image hover popover
+ * go to top button
+ */
 
 export function Search() {
   const navigate = useNavigate();
@@ -60,6 +59,7 @@ export function Search() {
       };
     },
     initialPageParam: null,
+    // @ts-expect-error useInfiniteQuery is not cooperating to properly type initialPageParam
     getNextPageParam: lastPage => lastPage.next,
   });
 
